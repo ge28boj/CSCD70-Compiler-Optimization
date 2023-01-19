@@ -1,0 +1,25 @@
+Start testing: Jan 11 18:07 UTC
+----------------------------------------------------------
+1/1 Testing: DFATest
+1/1 Test: DFATest
+Command: "/usr/local/bin/lit" "-v" "/mnt/build/test"
+Directory: /mnt/build/test
+"DFATest" start time: Jan 11 18:07 UTC
+Output:
+----------------------------------------------------------
+-- Testing: 3 tests, 3 workers --
+PASS: DFA :: AvailExpr.ll (1 of 3)
+PASS: DFA :: Liveness.ll (2 of 3)
+PASS: DFA :: LCM.ll (3 of 3)
+
+Testing Time: 0.07s
+  Passed: 3
+<end of output>
+Test time =   0.17 sec
+----------------------------------------------------------
+Test Passed.
+"DFATest" end time: Jan 11 18:07 UTC
+"DFATest" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Jan 11 18:07 UTC

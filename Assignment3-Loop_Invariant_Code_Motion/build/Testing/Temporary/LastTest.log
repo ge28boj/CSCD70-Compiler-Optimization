@@ -1,0 +1,166 @@
+Start testing: Jan 16 00:34 UTC
+----------------------------------------------------------
+1/1 Testing: LICMTest
+1/1 Test: LICMTest
+Command: "/usr/local/bin/lit" "-v" "/mnt/build/test"
+Directory: /mnt/build/test
+"LICMTest" start time: Jan 16 00:34 UTC
+Output:
+----------------------------------------------------------
+-- Testing: 2 tests, 2 workers --
+PASS: LICM :: RegAlloc.c (1 of 2)
+FAIL: LICM :: LICM.ll (2 of 2)
+******************** TEST 'LICM :: LICM.ll' FAILED ********************
+Script:
+--
+: 'RUN: at line 1';   /usr/lib/llvm-12/bin/opt -S -load /mnt/build/lib/libLICM.so      -loop-invariant-code-motion /mnt/test/LICM.ll -o LICM.ll
+: 'RUN: at line 3';   /usr/lib/llvm-12/bin/FileCheck --match-full-lines --check-prefix=CODEGEN /mnt/test/LICM.ll --input-file=LICM.ll
+: 'RUN: at line 4';   /usr/lib/llvm-12/bin/llc -load /mnt/build/lib/libLICM.so -regalloc=intfgraph LICM.ll -o LICM.ll.s
+: 'RUN: at line 9';   /usr/lib/llvm-12/bin/clang LICM.ll.s -o LICM.ll.exe
+: 'RUN: at line 10';   ./LICM.ll.exe | /usr/lib/llvm-12/bin/FileCheck --match-full-lines --check-prefix=CORRECTNESS /mnt/test/LICM.ll
+--
+Exit Code: -6
+
+Command Output (stdout):
+--
+$ ":" "RUN: at line 1"
+$ "/usr/lib/llvm-12/bin/opt" "-S" "-load" "/mnt/build/lib/libLICM.so" "-loop-invariant-code-motion" "/mnt/test/LICM.ll" "-o" "LICM.ll"
+# command stderr:
+0xf24d00
+
+$ ":" "RUN: at line 3"
+$ "/usr/lib/llvm-12/bin/FileCheck" "--match-full-lines" "--check-prefix=CODEGEN" "/mnt/test/LICM.ll" "--input-file=LICM.ll"
+$ ":" "RUN: at line 4"
+$ "/usr/lib/llvm-12/bin/llc" "-load" "/mnt/build/lib/libLICM.so" "-regalloc=intfgraph" "LICM.ll" "-o" "LICM.ll.s"
+# command output:
+************************************************
+* Machine Function
+************************************************
+0B	bb.0 (%ir-block.2):
+	  successors: %bb.1(0x80000000); %bb.1(100.00%)
+	  liveins: $edi, $esi
+16B	  undef %30.sub_32bit:gr64_with_sub_8bit = COPY $esi
+32B	  undef %32.sub_32bit:gr64_with_sub_8bit = COPY $edi
+64B	  %0:gr32 = LEA64_32r %32:gr64_with_sub_8bit, 1, $noreg, 4, $noreg
+96B	  undef %45.sub_32bit:gr64_with_sub_8bit = LEA64_32r %32:gr64_with_sub_8bit, 1, $noreg, 7, $noreg
+128B	  %32.sub_32bit:gr64_with_sub_8bit = nsw ADD32ri8 %32.sub_32bit:gr64_with_sub_8bit(tied-def 0), 3, implicit-def dead $eflags
+160B	  %30.sub_32bit:gr64_with_sub_8bit = INC32r %30.sub_32bit:gr64_with_sub_8bit(tied-def 0), implicit-def dead $eflags
+176B	  %39:gr32 = MOV32ri 9
+192B	  undef %34.sub_32bit:gr64_with_sub_8bit = MOV32r0 implicit-def dead $eflags
+224B	  %14:gr32 = LEA64_32r %32:gr64_with_sub_8bit, 1, $noreg, 7, $noreg
+256B	  %16:gr32 = LEA64_32r %45:gr64_with_sub_8bit, 1, $noreg, 5, $noreg
+304B	  %6:gr32 = MOV32r0 implicit-def dead $eflags
+320B	  %7:gr32 = MOV32r0 implicit-def dead $eflags
+
+352B	bb.1 (%ir-block.7):
+	; predecessors: %bb.0, %bb.4
+	  successors: %bb.2(0x40000000), %bb.3(0x40000000); %bb.2(50.00%), %bb.3(50.00%)
+
+448B	  CMP32ri8 %30.sub_32bit:gr64_with_sub_8bit, 4, implicit-def $eflags
+464B	  JCC_1 %bb.3, 15, implicit killed $eflags
+480B	  JMP_1 %bb.2
+
+496B	bb.2 (%ir-block.9):
+	; predecessors: %bb.1
+	  successors: %bb.4(0x80000000); %bb.4(100.00%)
+
+528B	  %39:gr32 = nsw ADD32ri8 %39:gr32(tied-def 0), 2, implicit-def dead $eflags
+544B	  %6:gr32 = COPY %32.sub_32bit:gr64_with_sub_8bit
+576B	  JMP_1 %bb.4
+
+592B	bb.3 (%ir-block.12):
+	; predecessors: %bb.1
+	  successors: %bb.5(0x04000000), %bb.6(0x7c000000); %bb.5(3.12%), %bb.6(96.88%)
+
+624B	  %39:gr32 = DEC32r %39:gr32(tied-def 0), implicit-def dead $eflags
+640B	  CMP32ri8 %30.sub_32bit:gr64_with_sub_8bit, 9, implicit-def $eflags
+656B	  JCC_1 %bb.5, 15, implicit killed $eflags
+
+672B	bb.6:
+	; predecessors: %bb.3
+	  successors: %bb.4(0x80000000); %bb.4(100.00%)
+
+688B	  %6:gr32 = COPY %0:gr32
+
+720B	bb.4 (%ir-block.15):
+	; predecessors: %bb.2, %bb.6
+	  successors: %bb.1(0x80000000); %bb.1(100.00%)
+
+784B	  %6:gr32 = nsw ADD32ri8 %6:gr32(tied-def 0), 2, implicit-def dead $eflags
+816B	  %30.sub_32bit:gr64_with_sub_8bit = INC32r %30.sub_32bit:gr64_with_sub_8bit(tied-def 0), implicit-def dead $eflags
+848B	  undef %34.sub_32bit:gr64_with_sub_8bit = COPY %16:gr32
+880B	  %7:gr32 = COPY %14:gr32
+912B	  JMP_1 %bb.1
+
+928B	bb.5 (%ir-block.20):
+	; predecessors: %bb.3
+
+944B	  ADJCALLSTACKDOWN64 24, 0, 24, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+1008B	  $rdi = MOV32ri64 @.str
+1024B	  $esi = COPY %39:gr32
+1040B	  $edx = COPY %0:gr32
+1056B	  $ecx = COPY %7:gr32
+1072B	  $r8d = COPY %6:gr32
+1088B	  $r9d = COPY %45.sub_32bit:gr64_with_sub_8bit
+1104B	  dead $eax = MOV32r0 implicit-def dead $eflags, implicit-def $al
+1136B	  PUSH64r %30:gr64_with_sub_8bit, implicit-def $rsp, implicit $rsp :: (store 4 into stack + 16)
+1152B	  CFI_INSTRUCTION adjust_cfa_offset 8
+1184B	  PUSH64r %32:gr64_with_sub_8bit, implicit-def $rsp, implicit $rsp :: (store 4 into stack + 8)
+1200B	  CFI_INSTRUCTION adjust_cfa_offset 8
+1232B	  PUSH64r %34:gr64_with_sub_8bit, implicit-def $rsp, implicit $rsp :: (store 4 into stack)
+1248B	  CFI_INSTRUCTION adjust_cfa_offset 8
+1264B	  CALL64pcrel32 target-flags(x86-plt) @printf, <regmask $bh $bl $bp $bph $bpl $bx $ebp $ebx $hbp $hbx $rbp $rbx $r12 $r13 $r14 $r15 $r12b $r13b $r14b $r15b $r12bh $r13bh $r14bh $r15bh $r12d $r13d $r14d $r15d $r12w $r13w $r14w $r15w $r12wh and 3 more...>, implicit $rsp, implicit $ssp, implicit $rdi, implicit $esi, implicit killed $edx, implicit killed $ecx, implicit killed $r8d, implicit killed $r9d, implicit killed $al, implicit-def $rsp, implicit-def $ssp, implicit-def dead $eax
+1280B	  ADJCALLSTACKUP64 24, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+1296B	  RET 0
+
+
+
+	0
+Inserting {Reg=}%0 [64r,1040r:0)  0@64r weight:0.00
+# command stderr:
+LLVM ERROR: Cannot emit physreg copy instruction
+PLEASE submit a bug report to https://bugs.llvm.org/ and include the crash backtrace.
+Stack dump:
+0.	Program arguments: /usr/lib/llvm-12/bin/llc -load /mnt/build/lib/libLICM.so -regalloc=intfgraph LICM.ll -o LICM.ll.s
+1.	Running pass 'Function Pass Manager' on module 'LICM.ll'.
+2.	Running pass 'Post-RA pseudo instruction expansion pass' on function '@foo'
+ #0 0x00007f98790da871 llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) (/lib/x86_64-linux-gnu/libLLVM-12.so.1+0xd26871)
+ #1 0x00007f98790d89a0 llvm::sys::RunSignalHandlers() (/lib/x86_64-linux-gnu/libLLVM-12.so.1+0xd249a0)
+ #2 0x00007f98790daf82 (/lib/x86_64-linux-gnu/libLLVM-12.so.1+0xd26f82)
+ #3 0x00007f98783a5420 __restore_rt (/lib/x86_64-linux-gnu/libpthread.so.0+0x14420)
+ #4 0x00007f9877e9600b raise (/lib/x86_64-linux-gnu/libc.so.6+0x4300b)
+ #5 0x00007f9877e75859 abort (/lib/x86_64-linux-gnu/libc.so.6+0x22859)
+ #6 0x00007f9879034b69 (/lib/x86_64-linux-gnu/libLLVM-12.so.1+0xc80b69)
+ #7 0x00007f9879034986 (/lib/x86_64-linux-gnu/libLLVM-12.so.1+0xc80986)
+ #8 0x00007f987b52436e (/lib/x86_64-linux-gnu/libLLVM-12.so.1+0x317036e)
+ #9 0x00007f9879325559 (/lib/x86_64-linux-gnu/libLLVM-12.so.1+0xf71559)
+#10 0x00007f98793fc60e llvm::MachineFunctionPass::runOnFunction(llvm::Function&) (/lib/x86_64-linux-gnu/libLLVM-12.so.1+0x104860e)
+#11 0x00007f987920e4f0 llvm::FPPassManager::runOnFunction(llvm::Function&) (/lib/x86_64-linux-gnu/libLLVM-12.so.1+0xe5a4f0)
+#12 0x00007f98792140a3 llvm::FPPassManager::runOnModule(llvm::Module&) (/lib/x86_64-linux-gnu/libLLVM-12.so.1+0xe600a3)
+#13 0x00007f987920eaf8 llvm::legacy::PassManagerImpl::run(llvm::Module&) (/lib/x86_64-linux-gnu/libLLVM-12.so.1+0xe5aaf8)
+#14 0x000000000040e990 main (/usr/lib/llvm-12/bin/llc+0x40e990)
+#15 0x00007f9877e77083 __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24083)
+#16 0x000000000040c38e _start (/usr/lib/llvm-12/bin/llc+0x40c38e)
+
+error: command failed with exit status: -6
+
+--
+
+********************
+********************
+Failed Tests (1):
+  LICM :: LICM.ll
+
+
+Testing Time: 0.22s
+  Passed: 1
+  Failed: 1
+<end of output>
+Test time =   0.33 sec
+----------------------------------------------------------
+Test Failed.
+"LICMTest" end time: Jan 16 00:34 UTC
+"LICMTest" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Jan 16 00:34 UTC

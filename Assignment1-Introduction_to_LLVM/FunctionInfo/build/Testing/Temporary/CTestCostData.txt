@@ -1,0 +1,3 @@
+FunctionInfoTest 0 0
+---
+FunctionInfoTest
