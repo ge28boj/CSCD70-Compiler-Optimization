@@ -1,3 +1,0 @@
-LocalOptsTest 0 0
----
-LocalOptsTest

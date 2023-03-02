@@ -30,7 +30,6 @@ private:
 	  // note: Expression(const BinaryOperator &BinaryOp)  
 	  if (getPos(Expression(*BinaryOp)) == -1)
 		Domain.push_back(Expression(*BinaryOp));
-	  //errs() << "\t" << Inst << "\n";
     }
   }
   virtual bool transferFunc(const Instruction &Inst, const DomainVal_t &IBV,
@@ -58,32 +57,20 @@ private:
 	errs() << "\n";
 	*/	
 
-	//errs() << Inst << "\n";
 	DomainVal_t tmpBV = IBV;
 
 	// kill set
 	const Value *I = &Inst;
-	//errs() << "Kill set(#): " << "\t";
 	
 	for (size_t i = 0; i < Domain.size(); i++) {
 		if (I == Domain[i].LHS || I == Domain[i].RHS) {
 			tmpBV[i] = false;
-			//errs() << i << "\t";
 		}
 	}
-	//errs() << "\n";
 
 	// gen set
 	tmpBV[getPos(*dyn_cast<BinaryOperator>(&Inst))] = true;
-	// errs() << "Gen set(#): " << getPos(*dyn_cast<BinaryOperator>(&Inst)) << "\n";
 
-	/*
-	errs() << "  OBV: ";
-	for (const auto& v : tmpBV) {
-		errs() << v << "\t";
-	}
-	errs() << "\n";
-	*/
 	// check whether output OBV has been changed
 	bool change = (OBV != tmpBV);
 	if(change)

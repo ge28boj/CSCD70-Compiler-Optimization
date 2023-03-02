@@ -25,6 +25,8 @@ using LivenessFrameworkBase =
  */
 class Liveness final : public LivenessFrameworkBase, public FunctionPass {
 private:
+  using MeetOperands_t = std::vector<DomainVal_t>;
+
   virtual void initializeDomainFromInst(const Instruction &Inst) override {
 	//TODO
 	for (const auto &op : Inst.operands()) {
@@ -34,6 +36,40 @@ private:
 			}
 		}
 	}
+  }
+
+  // phi instructions have ramifications on how liveness analysis is implemented
+  virtual DomainVal_t getBoundaryVal(const BasicBlock &BB) const override {
+	MeetOperands_t Operands;
+	for (const auto &pred : successors(&BB)) {
+      const Instruction *inst = &(pred->front());
+	  DomainVal_t original_bV = InstDomainValMap.at(inst);
+
+	  for (const auto &phi : pred->phis()) {
+		for (const auto &block : phi.blocks()) {
+		  if (block != &BB) {
+			Value *v = phi.getIncomingValueForBlock(block);
+			if (getPos(Variable(v)) != -1)
+			  original_bV[getPos(Variable(v))] = false;
+		  }		  
+		}		
+	  }
+
+	  Operands.push_back(original_bV); 
+	}
+	
+	if (Operands.begin() == Operands.end()) {
+	  return bc();
+	}
+	return meet(Operands);
+	/*
+    Union MeetOp;
+	DomainVal_t mergedBV = MeetOp.top(Domain.size());
+	for (const auto &BitVector : MeetOperands) {
+	  mergedBV = MeetOp(mergedBV, BitVector);
+	}
+	return mergedBV;
+	*/
   }
 
   virtual bool transferFunc(const Instruction &Inst, const DomainVal_t &IBV,

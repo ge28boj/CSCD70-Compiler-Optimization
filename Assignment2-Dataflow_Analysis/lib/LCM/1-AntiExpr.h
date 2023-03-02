@@ -29,8 +29,10 @@ private:
   	//TODO
   	if (const BinaryOperator *const BinaryOp =
   			dyn_cast<BinaryOperator>(&Inst)) {
-  		if (getPos(Expression(*BinaryOp)) == -1)
-  			Domain.push_back(Expression(*BinaryOp));		
+  		if (getPos(Expression(*BinaryOp)) == -1) {
+  			Domain.push_back(Expression(*BinaryOp));
+  			errs() << Expression(*BinaryOp) << "\n";
+  		}		
   	}
   }
   virtual bool transferFunc(const Instruction &Inst, const DomainVal_t &IBV,

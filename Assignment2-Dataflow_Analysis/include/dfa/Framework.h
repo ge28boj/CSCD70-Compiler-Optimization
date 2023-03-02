@@ -159,12 +159,36 @@ protected:
     return meet(MeetOperands);
   }
   
-  int getPos(const TDomainElem &E) {
+  // it's important that the function method shoud be marked as const !
+  // because Variable(...) takes a "const Value *const" as parameter (here serve as TDomainelem)
+  // see https://www.youtube.com/watch?v=4fJBrditnJU for more explanations 
+  int getPos(const TDomainElem &E) const {
   	auto it = std::find(Domain.begin(), Domain.end(), E);
   	if (it == Domain.end())
   		return -1;
   	else
   		return std::distance(Domain.begin(), it);
+  }
+  
+  /**
+   * @brief Boundary Condition
+   */
+   // Do we need to initialize DomainVal_t's value?
+  DomainVal_t bc() const { return DomainVal_t(Domain.size()); }
+  /**
+   * @brief Apply the meet operator to the operands.
+   */
+  DomainVal_t meet(const MeetOperands_t &MeetOperands) const {
+    /**
+     * TODO (cscd70) Please complete the defintion of this method.
+     */
+    // setup initial condition
+    TMeetOp MeetOp;
+	DomainVal_t mergedBitVector = MeetOp.top(Domain.size());
+	for (const auto &BitVector : MeetOperands) {
+		mergedBitVector = MeetOp(mergedBitVector, BitVector);
+	}
+    return mergedBitVector;
   }
 
 private:
@@ -196,26 +220,7 @@ private:
      }
     return Operands;
   }
-  /**
-   * @brief Boundary Condition
-   */
-   // Do we need to initialize DomainVal_t's value?
-  DomainVal_t bc() const { return DomainVal_t(Domain.size()); }
-  /**
-   * @brief Apply the meet operator to the operands.
-   */
-  DomainVal_t meet(const MeetOperands_t &MeetOperands) const {
-    /**
-     * TODO (cscd70) Please complete the defintion of this method.
-     */
-    // setup initial condition
-    TMeetOp MeetOp;
-	DomainVal_t mergedBitVector = MeetOp.top(Domain.size());
-	for (const auto &BitVector : MeetOperands) {
-		mergedBitVector = MeetOp(mergedBitVector, BitVector);
-	}
-    return mergedBitVector;
-  }
+  
   /*****************************************************************************
    * Transfer Function
    *****************************************************************************/
@@ -320,6 +325,7 @@ protected:
     TMeetOp MeetOp;
     for (const auto &Inst : instructions(F)) {
       InstDomainValMap.emplace(&Inst, MeetOp.top(Domain.size()));
+      //errs() << Inst << "\n";
     }
     // keep traversing until no changes have been made to the
     // instruction-domain value mapping
